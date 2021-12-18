@@ -15,5 +15,6 @@ public class Main {
 		WikiTOC wiki = new WikiTOC("Puerto Rico - Wikipedia.html");
 		TableOfContents tc = wiki.toTOC();
 		tc.print();
+		tc.toHTML("output.html");
 	}
 }

@@ -11,6 +11,8 @@ public class WikiTOC {
 		catch (IOException e) {
 			e.printStackTrace(); }
 	}
+		
+	TableOfContents temp;
 	
 	public TableOfContents toTOC() {
 		String line;
@@ -28,22 +30,24 @@ public class WikiTOC {
 	}
 	
 	public void getChapters(TableOfContents tc, int hLevel) {
-		String line;
+		temp = tc;
 		try {
-		while((line = br.readLine()) != null) {
+		String line = br.readLine();
+		while(line != null) {
+			if(line.contains("<p>"))
+				temp.writeContent(line);
 			if(line.contains("<h" + (hLevel - 1) + ">") && line.contains("<span class=\"mw-headline\"")) {
-				//System.out.println(line);
-				tc.parent.add(line.substring(line.indexOf("\">", line.indexOf("class"))+2, line.indexOf("</span></h" + (hLevel - 1) + ">")));
+				temp = tc.parent.addAndReturn(line.substring(line.indexOf("\">", line.indexOf("class"))+2, line.indexOf("</span></h" + (hLevel - 1) + ">")));
 				getChapters(tc.parent, hLevel - 1);
 			}
 			if(line.contains("<h" + hLevel + ">") && line.contains("<span class=\"mw-headline\"")) {
-				//System.out.println(line);
-				tc.add(line.substring(line.indexOf("\">", line.indexOf("class"))+2, line.indexOf("</span></h" + hLevel + ">")));
+				temp = tc.addAndReturn(line.substring(line.indexOf("\">", line.indexOf("class"))+2, line.indexOf("</span></h" + hLevel + ">")));
 			}
 			if(line.contains("<h" + (hLevel + 1) + ">") && line.contains("<span class=\"mw-headline\"")) {
-				tc.get(tc.size()-1).add(line.substring(line.indexOf("\">", line.indexOf("class"))+2, line.indexOf("</span></h" + (hLevel + 1) + ">")));
+				temp = tc.get(tc.size()-1).addAndReturn(line.substring(line.indexOf("\">", line.indexOf("class"))+2, line.indexOf("</span></h" + (hLevel + 1) + ">")));
 				getChapters(tc.get(tc.size()-1), hLevel + 1);
 			}
+			line = br.readLine();
 		}} catch (IOException e) {
 			e.printStackTrace(); }
 	}

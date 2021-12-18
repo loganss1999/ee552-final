@@ -1,10 +1,13 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class TableOfContents {
 	
 	public String title;
-	private String content;
+	private String content = "";
 	public TableOfContents parent;
 	public List<TableOfContents> chapters;
 	
@@ -22,6 +25,12 @@ public class TableOfContents {
 	
 	public void add(String title) {
 		chapters.add(new TableOfContents(title, this));
+	}
+	
+	public TableOfContents addAndReturn(String title) { //adds and returns newly added TOC (good for adding content to new sections)
+		TableOfContents temp = new TableOfContents(title, this);
+		chapters.add(temp);
+		return temp;
 	}
 	
 	public void add(TableOfContents tc) {
@@ -59,11 +68,19 @@ public class TableOfContents {
 	}
 	
 	public String readContent() {
-		return title;
+		return content;
+	}
+	
+	public void printContent() {
+		System.out.println(content);
+	}
+	
+	public void deleteContent() {
+		content = "";
 	}
 	
 	public void writeContent(String con) {
-		title = new String(con);
+		content = content.concat(con + '\n');
 	}
 	
 	public int size() {
@@ -93,6 +110,37 @@ public class TableOfContents {
 		}
 	}
 	
+	BufferedWriter bw;
 	
+	public void toHTML(String path) {
+		try {
+		bw = new BufferedWriter(new FileWriter(path));
+		bw.write("<html><body><h1>" + title + "</h1>");
+		bw.write(content);
+		for(TableOfContents chapter : chapters) {
+			chapter.toHTML(2);
+		}
+		}catch (IOException e) {
+			e.printStackTrace(); }
+	}
 	
+	public void toHTML(int hLevel) {
+		try {
+		bw.write("<h" + hLevel + ">" + title + "</h" + hLevel + ">");
+		bw.write(content);
+		for(TableOfContents chapter : chapters) {
+			chapter.toHTML(hLevel + 1);
+		}
+		}catch (IOException e) {
+			e.printStackTrace(); }
+	}
+	
+	public void toRTF(String path) {
+		
+	}
+	
+	@Override
+	public String toString() {
+		return "";
+	}
 }
