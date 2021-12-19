@@ -3,6 +3,7 @@ import java.util.List;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.File;
 
 public class TableOfContents {
 	
@@ -10,6 +11,7 @@ public class TableOfContents {
 	private String content = "";
 	public TableOfContents parent;
 	public List<TableOfContents> chapters;
+	public List<TableOfContents> links;
 	
 	TableOfContents(String title) { //head of table
 		this.title = title;
@@ -37,6 +39,10 @@ public class TableOfContents {
 		chapters.add(tc);
 	}
 	
+	public void addLink(TableOfContents tc) {
+		links.add(tc);
+	}
+	
 	public void remove(int ch) {
 		chapters.remove(ch);
 	}
@@ -47,6 +53,10 @@ public class TableOfContents {
 	
 	public TableOfContents get(int pos) {
 		return chapters.get(pos);
+	}
+	
+	public TableOfContents getLink(int pos) {
+		return links.get(pos);
 	}
 	
 	public void promote() { 
@@ -114,29 +124,48 @@ public class TableOfContents {
 	
 	public void toHTML(String path) {
 		try {
-		bw = new BufferedWriter(new FileWriter(path));
+		File f = new File(path);
+		bw = new BufferedWriter(new FileWriter(f));
 		bw.write("<html><body><h1>" + title + "</h1>");
 		bw.write(content);
 		for(TableOfContents chapter : chapters) {
-			chapter.toHTML(2);
+			bw.write("<h2>" + chapter.title + "</h2>");
+			bw.write("<hr size=\"1\" width=\"100%\" color=\"black\">");
+			bw.write(chapter.content);
+			for(TableOfContents subchapter : chapter.chapters) {
+				bw.write("<h3>" + subchapter.title + "</h3>");
+				bw.write(subchapter.content);
+				for(TableOfContents subsubchapter : subchapter.chapters) {
+					bw.write("<h4>" + subsubchapter.title + "</h4>");
+					bw.write(subsubchapter.content);
+				}
+			}
 		}
 		}catch (IOException e) {
 			e.printStackTrace(); }
 	}
 	
-	public void toHTML(int hLevel) {
+	public void toFile(String path) { //works best with txt, supports rtf
 		try {
-		bw.write("<h" + hLevel + ">" + title + "</h" + hLevel + ">");
-		bw.write(content);
+		File f = new File(path);
+		bw = new BufferedWriter(new FileWriter(f));
+		bw.write(title); bw.newLine();
+		bw.write(content); bw.newLine();
 		for(TableOfContents chapter : chapters) {
-			chapter.toHTML(hLevel + 1);
+			bw.write(chapter.title); bw.newLine();
+			bw.write(chapter.content); bw.newLine();
+			for(TableOfContents subchapter : chapter.chapters) {
+				bw.write("\t" + subchapter.title); bw.newLine();
+				bw.write("\t" + subchapter.content); bw.newLine();
+				for(TableOfContents subsubchapter : subchapter.chapters) {
+					bw.write("\t\t" + subsubchapter.title); bw.newLine();
+					bw.write("\t\t" + subsubchapter.content); bw.newLine();
+				}
+			}
 		}
+		bw.close();
 		}catch (IOException e) {
 			e.printStackTrace(); }
-	}
-	
-	public void toRTF(String path) {
-		
 	}
 	
 	@Override

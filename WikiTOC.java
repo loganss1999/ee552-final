@@ -21,6 +21,7 @@ public class WikiTOC {
 		while((line = br.readLine()) != null) {
 			if(line.contains("<h1 id=\"firstHeading\" class=\"firstHeading\">")) {
 				tc = new TableOfContents(line.substring(line.indexOf("\">")+2, line.indexOf("</h1>")));
+				temp = tc;
 				getChapters(tc, 2);
 				return tc;
 			}
@@ -30,7 +31,6 @@ public class WikiTOC {
 	}
 	
 	public void getChapters(TableOfContents tc, int hLevel) {
-		temp = tc;
 		try {
 		String line = br.readLine();
 		while(line != null) {
